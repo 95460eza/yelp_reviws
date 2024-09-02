@@ -1,0 +1,10 @@
+# virtual envs
+.venv*
+venv*
+.python-version
+
+# data folder
+data/
+
+
+
