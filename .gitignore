@@ -1,6 +1,8 @@
 # virtual envs
 .venv*
 venv*
+.venv*/
+venv*/
 .python-version
 
 # data folder
