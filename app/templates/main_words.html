@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main words in Reviews</title>
+    <style>
+        body {
+            background-color: #a3d5d3; /* Light greenish-blue background */
+            margin: 0; /* Remove default margin */
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Main words used for complaints in this Topic</h1>
+    <p><h2>Words: {{ main_words_used1 }}</h2></p>
+    <p><h2>Frequency: {{ main_words_used2 }}</h2></p>
+    <!-- Ensure you pass the filename dynamically if needed -->
+    <a href="{{ url_for('show_data', filename=filename) }}">Back to the Reviews Table</a>
+</body>
+</html>

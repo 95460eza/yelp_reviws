@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Detail</title>
+    <style>
+        body {
+            background-color: #a3d5d3; /* Light greenish-blue background */
+            margin: 0; /* Remove default margin */
+        }
+    </style>
+</head>
+<body>
+    <h1>Actual text of Review Analyzed</h1>
+    <p>{{ review }}</p>
+    <!-- Ensure you pass the filename dynamically if needed -->
+    <a href="{{ url_for('show_data', filename=filename) }}">Back to the Reviews Table</a>
+</body>
+</html>
