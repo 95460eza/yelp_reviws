@@ -8,5 +8,15 @@ venv*/
 # data folder
 data/
 
+# model folder
+HDBSCAN_model/
+bertopic_500/
+
+
+# data csv
+yelp_data_cleaned.csv
+
+# exlcude python notebook files
+*.ipynb
 
 
