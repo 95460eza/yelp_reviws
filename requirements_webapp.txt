@@ -1,0 +1,12 @@
+#numpy<2
+numpy
+pandas
+scikit-learn
+flask
+bertopic
+sentence-transformers
+
+gunicorn
+
+
+

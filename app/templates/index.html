@@ -4,12 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload CSV</title>
+    <style>
+        body {
+            background-color: #a3d5d3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }        
+        .underline {
+            text-decoration: underline; /* Underline text */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 24px;
+            font-family: Montserrat; /* Corrected property name and added colon */            
+            /*font-family: 'Pacifico', cursive; */
+            /*font-family: 'Helvetica, Arial, sans-serif'; */
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #FF5722; /* Changed to yellow */
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload a CSV File</h1>
-    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+            
+        </div>        
+        <h1> 
+            Upload a .csv of <span style="color: #e0a800; text-decoration: underline;">your restaurant's bad reviews</span> to discover the key issues and compare your results to nearly 40,000 other US restaurants!
+        </h1>
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file"><br>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
 </body>
 </html>
