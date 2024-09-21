@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <title>CSV Data</title>
+    <style>
+        body {
+            background-color: #a3d5d3; /* Light greenish-blue background */
+            margin: 0; /* Remove default margin */
+        }
+        .underline {
+            text-decoration: underline; /* Underline text */
+        }
+        .container {
+            padding: 20px;
+            max-width: 1200px; /* Set a maximum width for the container */
+            margin: 0 auto; /* Center container horizontally */
+        }
+        .header {
+            text-align: center; /* Center text in header */
+            margin-bottom: 20px;
+        }
+        .logo-box {
+            background-color: white; /* White box for logo */
+            padding: 20px;
+            border-radius: 10px; /* Optional: rounded corners */
+            display: inline-block;
+            width: 100%; /* Make the logo box span the full width */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Optional: shadow for better appearance */
+        }
+        .logo {
+            max-width: 150px; /* Adjust the max width for the image */
+            height: auto; /* Maintain aspect ratio */
+            display: block;
+            margin: 0 auto; /* Center logo horizontally */
+        }
+        .tables-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+        .table {
+            width: 35%; /* Default width for table */
+        }
+        .table2 {
+            width: 55%; /* Default width for table 2 */
+            margin-top: 1px; /* Increase space between pie chart and Table 2 */
+        }    
+        .table h3, .table2 h3 {
+            /*color: '#555555', */ /* Changed to black */
+            /*color: '#000000'; */ /* Changed to black */
+            color: grey;  /* Changed to grey */
+            font-family: 'Helvetica, Arial, sans-serif';
+            font-size: 25px; /* Same font size as chart title */
+            font-weight: bold; /* Match the font weight */
+        }
+        .table table, .table2 table {
+            width: 110%; /* Make the tables take full width */
+            border-collapse: collapse; /* Collapse borders for better appearance */
+        }
+        .table th, .table td, .table2 th, .table2 td {
+            white-space: nowrap; /* Prevent wrapping of text */
+            padding: 8px; /* Add padding for readability */
+            text-align: left; /* Align text to the left */
+        }
+        .table th {
+            background-color: #a3d5d3; /* Background color for headers */
+        }
+        .table2 th {
+            background-color: #a3d5d3; /* Background color for headers matching page */
+        }
+        /* Allow wrapping in the second column of .table */
+        .table td:nth-child(2), .table th:nth-child(2) {
+            white-space: normal; /* Allow wrapping in the second column */
+            word-wrap: break-word; /* Break long words and wrap text */
+            max-width: 1; /* Optional: Set a maximum width for cells in the second column */
+        }
+        /* Specific style for the third column of table2 */
+        .table2 td:nth-child(3), .table2 th:nth-child(3) {
+            white-space: normal; /* Allow wrapping in the third column */
+            word-wrap: break-word; /* Break long words and wrap text */
+            max-width: 100px; /* Optional: Set a maximum width for cells in the third column */
+        }
+        .table td {
+            max-width: 300px; /* Adjust as necessary */
+            overflow: hidden; /* Hide overflowing content */
+            text-overflow: ellipsis; /* Show ellipsis for overflowed content */
+            white-space: normal; /* Allows text wrapping */
+        }
+        .chart-container {
+            margin-top: 50px;
+            display: flex; /* Use Flexbox */
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Center items horizontally (if desired) */
+            margin-right: 150px;
+        }        
+        .chart-wrapper {
+            width: 200%; /* Adjust width of the chart container */
+            height: 500px; /* Set a specific height for the chart */
+        }
+        .chart-labels {
+            width: 50%; /* Adjust width for the labels */            
+            padding-left: 20px;
+            display: flex; /* Use Flexbox */
+            flex-direction: row; /* Stack items vertically */
+            align-items: flex-start; /* Center items horizontally (if desired) */
+        }
+        .text-container {
+            margin-top: 500px; /* Space between pie chart and this text container */
+            background-color: #a3d5d3; /* Light background to make the text container stand out */
+            padding: 0px;
+            border-radius: 5px;
+            display: flex; /* Use Flexbox */
+            text-align: flex-start;
+            width: 200%; /* Adjust the width of the text container */
+            margin: 0 auto; /* Center text container horizontally */
+            font-size: 13px; /* Adjust the font size here */
+        }        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logo-box">
+                <!-- Replace 'logo.png' with the actual path to your logo -->
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+            </div>
+            <a href="{{ url_for('index') }}" style="display: block; text-align: left;">Back to the Upload Page</a>
+        </div>        
+        <div class="tables-container">
+            <div class="table">
+                <h3>Key Complaints</h3>
+                <table class="table table-striped">
+                    <thead>                        
+                        <tr>
+                            <th>{{ grouped_counts_columns[0] }}</th>
+                            <th>{{ grouped_counts_columns[1] }}</th>
+                            <th>{{ grouped_counts_columns[3] }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in table %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('main_words', main_words_used1=row[2][0], main_words_used2=row[2][1]) }}">
+                                    {{ row[0] }}
+                                </a>
+                            </td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <!-- Pie chart container -->
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    <div class="chart-labels">
+                        <!-- You can add custom HTML here if needed for additional labels or text -->
+                    </div>  
+                </br>
+                    <!-- Additional text container below pie chart -->
+                    <div class="text-container">
+                        <p><span class="underline">Metadata</span>: This Web App shows the results of a BERTopic model using Yelp data. 
+                            <br>250 thousand reviews and 40 thousand businesses are included in sample.
+                            <br>Only reviews not predicted as outliers are displayed.                            
+                        </p>                                              
+                    </div>                                  
+                    <div class="text-container">
+                        <p>Copyrights eat-here 2024</p>                        
+                    </div>                                  
+                </div>
+            </div>
+            <div class="table2">
+                <h3>Main Issue per Review</h3>
+                <table class="table table-striped">
+                    <thead>                        
+                        <tr>
+                            <th>{{ columns[0] }}</th>
+                            <th>{{ columns[1] }}</th>
+                            <th>{{ columns[2] }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row2, row3 in table2 | zip(table3) %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('display_review', review=row3[0]) }}">
+                                    {{ row2[0] }}
+                                </a>
+                            </td>
+                            <td>{{ row2[1] }}</td>
+                            <td>{{ row2[2] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>        
+        </div>        
+    </div>    
+    <script>
+        // Function to generate random colors
+        function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+        }
+        // Function to generate an array of random colors based on the number of categories
+        function generateColors(numCategories) {
+        var colors = [];
+        for (var i = 0; i < numCategories; i++) {
+            colors.push(getRandomColor());
+        }
+        return colors;
+        }
+        var chartData = {{ chart_data | tojson | safe }};
+        var ctx = document.getElementById('pieChart').getContext('2d');
+        // Dynamically generate a color for each category
+        var colors = generateColors(chartData.labels.length);
+        var pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Proportions',
+                    data: chartData.data,
+                    //backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#E7E9ED'],
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        anchor: 'end',
+                        align: 'left', // Align labels to the left
+                        display: true,
+                        formatter: (value) => `${(value * 100).toFixed(1)}%`, // Display value as percentage
+                        font: {
+                            weight: 'bold'
+                        },
+                        offset: 10,
+                        padding: 10
+                    },
+                    title: {
+                        display: true,
+                        text: 'Complaints Distribution for US Restaurants', // Set the title text here
+                        font: {
+                            color: '#000000',
+                            size: 20, // Adjust the font size if needed
+                            family: 'Helvetica, Arial, sans-serif', // Same font family as h3 elements
+                            weight: 'bold', // Same font weight as h3 elements
+                            //style: 'italic', // Optional: add font style (e.g., italic)                            
+                        },
+                        padding: {
+                            bottom: 20 // Space between title and chart
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10 // Add padding to accommodate the labels
+                    }
+                }
+            }
+        });
+    </script>
+    <a href="{{ url_for('index') }}">Back to the Upload Page</a>
+</body>
+</html>
