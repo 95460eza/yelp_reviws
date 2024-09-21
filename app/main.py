@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import spacy
 
+
 from sklearn.feature_extraction.text import CountVectorizer
 
 from flask import Flask, request, render_template, redirect, url_for
@@ -12,7 +13,9 @@ from flask import Flask, request, render_template, redirect, url_for
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 
+
 spacy.cli.download("en_core_web_sm")
+
 
 app = Flask(__name__)
 
@@ -67,9 +70,11 @@ topics_mapping_dict = {
 
 
 # Extract topics for each cluster using CountVectorizer or TF-IDF Vectorizer
+
 def extract_topics(list_of_documents, top_n=6):
     vectorizer = CountVectorizer(stop_words='english', max_features=1000)
     X = vectorizer.fit_transform(list_of_documents)
+
     
     word_freq = np.array(X.sum(axis=0)).flatten()
     words = np.array(vectorizer.get_feature_names_out())
@@ -108,8 +113,6 @@ def upload_file():
         file_path = 'temp.csv'
         file.save(file_path)
 
-        #print("\n+++++++++++++++++++++++++++++++ DATA FILE SAVED ++++++++++++++++++++++++++++\n")
-
         # Read the CSV file with no delimiter (everything treated as a single column)
         # with open('test.csv', 'r') as f:
         #    data = f.read()
@@ -123,9 +126,6 @@ def upload_file():
 
 
 
-
-
-
 @app.route('/show_data/<filename>')
 def show_data(filename):
     
@@ -135,13 +135,13 @@ def show_data(filename):
     
     # Read the CSV file with no delimiter (everything treated as a single column)
     
-    # In CSV format, a row containing a break (newline or carriage return) MUST be enclosed in double quotes ("). The csv.reader 
-    # treats the quoted data as a single row, even if it spans multiple lines in the actual file.    
+
     with open(file_path, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         for row in reader:
             if row:  # Ensure that the row is not empty
                 sentences.append(row[0])
+
 
     # NORMALLY SHOULD DO THE EXACT SAME CLEANING AS ON TRAINING DATA - SPECIALLY LEMMATIZING!!!!!!!!!!!!!!!!!!!!!!!!!
     # Clean the data: remove newlines, commas, and quotes
@@ -159,10 +159,13 @@ def show_data(filename):
     new_documents = lemmatize_documents(new_documents)
 
 
+
     # Read into a Pandas DataFrame
     # df = pd.read_csv(file, header=None, quotechar='"', names=["text"])
     df = pd.DataFrame(new_documents, columns=['Review Analyzed'])
+
     #df['Original doc'] = sentences
+
     
     # Predict topics for new documents
     
@@ -177,12 +180,14 @@ def show_data(filename):
     unique_clusters = np.unique(topic_model.get_topic_info()['Topic'])
     clustered_documents = {cluster_number: [] for cluster_number in unique_clusters}
     for index_in_dataframe_for_doc, cluster_number_for_doc in enumerate(df['Topic']):
+
         #print(index_in_dataframe_for_doc, cluster_number_for_doc)        
         #clustered_documents[cluster_number_for_doc].append(sentences[index_in_dataframe_for_doc] )
         clustered_documents[cluster_number_for_doc].append( df['Review Analyzed'][index_in_dataframe_for_doc] )
     
     #for key, values in clustered_documents.items():
     #print(f'********************************{key}*******{type(values)}**{len(values)}***********************************') 
+
         
     df['Topic'] = df['Topic'].map(topics_mapping_dict)
     
@@ -191,9 +196,11 @@ def show_data(filename):
     df['Proba in Review'] = df['Proba in Review'].apply(lambda x: f"{x:.0%}")
    
     
+
     #df['New Text'] = df['Review Analyzed']
     df['New Text'] = sentences
     df['Review Analyzed'] =  df['New Text'].apply(lambda x: x[0:80])
+
     
         
     
@@ -220,11 +227,13 @@ def show_data(filename):
     
     grouped_counts_columns = list(grouped_counts.columns)
     
+
     #data = grouped_counts.to_html(classes='table table-striped', header="true", index=False) 
     # EACH ELEMENT OF THE LIST IS A ROW       
     data = grouped_counts.values.tolist()
     #print(data) 
     
+
     
     #*********PREPARE INDIVIDUAL REVIEWS TABLE**************
     df_to_use = df[~mask_outliers_in]
@@ -235,6 +244,7 @@ def show_data(filename):
     #data2 = df.to_html(classes='table table-striped', header="true", index=False) 
     data2 = df_to_use.values.tolist()
     
+
     #print("\n+++++++++++++++++++++++++++++++ DATA 2 CREATED ++++++++++++++++++++++++++++\n")
 
 
@@ -242,6 +252,7 @@ def show_data(filename):
     data3 = df_sorted[['New Text']].values.tolist()
 
     #print("\n++++++++++++++++++++++++++++++++",len(data3),len(data2),"++++++++++++++++++++++++++++\n")
+
     
     #*********PREPARE DATA FOR PIE CHART**************
     
@@ -252,7 +263,9 @@ def show_data(filename):
     grouped_counts_us = grouped_counts_us[~mask_outlier_us]
     # Calculate the total
     total = grouped_counts_us['Number of Reviews'].sum()
+
     grouped_counts_us['proportion'] = 100 * grouped_counts_us['Number of Reviews'] / total
+
     #grouped_counts['proportion'] = grouped_counts['proportion'].apply(lambda x: f"{x:.0%}")
 
 

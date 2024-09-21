@@ -1,0 +1,108 @@
+### Business value of analysis (ppt):
+
+- Reasons for bad review
+    - Restaurants can gain insights into what issues to resolve to improve business 
+    - Customers can more efficienctly understand the key ideas being shared through reviews to more efficiently select a restaurant
+
+- Relevance of length of review
+    - which reviews should restos read to gain insights?
+    - if long reviews have no added value, can tell yelp to limit review entries to x nb of words
+- 
+
+
+### Nettoyage des données
+
+Steps: 
+- Extract data from json files (within tar) to create dataframe structure we can use in python 
+- Lemmatisation (NLTK library): 
+    - Converted to lower case
+    - Removed reviews that are less than 10 characters (exploration showed that information could not be conveyed in less than 10 characters)
+    - Removed non-alphabetic characters
+    - Removed stop words
+    - Lemmatised (Reduced to root form)
+- No duplicates and negligible NA issues (57 rows deleted)
+ 
+Isseus: 
+    - Issues extracting review data from json file due to large size (approx 7 million lines). 
+        - Resolved by adding (chunksize=6000) to pandas read_json module and concatenating slices
+        - Processing facilitated further by taking a random sample of data (25%), and further filtering by stars, categories, and language
+    - Some reivews in different languages
+        - Deteceted 34 languages (module langdetect) and filtered by english reviews 
+
+
+Description: 
+- RAW DATA: 150 346 businesses, ~ 7 million reviews (raw data)
+- SAMPLE: 135 756 reviews (random selection stratified by star rating to be sure to have values for each star level), 33 777 busineses
+- 94 519 reviews selected for analysis, 4 894 businesses
+    - selected reviews with 1 or 2 stars (approx 20%)
+    - selected reviews for restaurants (feature=categories)
+    - selected language == English 
+- Coverage: United States, 455 cities, 16 states
+    - Top cities:
+        Philadelphia    12.9%
+        New Orleans     08.7%
+        Nashville       07.3%
+        Tampa           06.4%
+        Tucson          04.8%
+    - Top states:
+        PA - Pennsylvania      23.5%
+        FL - Florida      16.6%
+        LA - Louisiana     10.9%
+        TN - Tennessee     10.5%
+        MO - Missouri      07.5%
+
+- Length of reviews follows skewed normal distribution, averageing at 121 words (median 89)
+        mean        122.305298
+        std         108.769873
+        min           1.000000
+        25%          51.000000
+        50%          90.000000
+        75%         157.000000
+        max         993.000000
+
+Futher work: 
+- Could use tips data to see if it provides better insights. 
+    - Tips written by a user on a business. 
+    - Tips are shorter than reviews and tend to convey quick suggestions.
+- Could refine the text cleaning to remove typos 
+
+### BERT Embedding + PCA + HDBSCAN clustering
+
+Issue: 
+- The models take long time to run--- had to work only in google colab 
+
+Explaining BERT model choice: 
+- We chose a Sentence-BERT (SBERT) model, which is specifically designed to create semantically meaningful sentence 
+ embeddings that work well for clustering, retrieval, and other similarity tasks. It fine-tunes BERT for sentence 
+ pair tasks, significantly improving the quality of the embeddings for tasks like clustering.
+- SBERT was designed for sentence-level embeddings (e.g., reviews, comments).
+- Model Name:  all-MiniLM-L6-v2.
+
+HDBSCAN presentation:
+- Hierarchical Density-Based Spatial Clustering of Applications with Noise. 
+- Performs DBSCAN over varying epsilon values and integrates the result to find a clustering 
+that gives the best stability over epsilon. This allows HDBSCAN to find clusters of varying
+densities (unlike DBSCAN), and be more robust to parameter selection. 
+- Both HDBSCAN and DBSCAN were designed to not be distracted by noise and focus on dense clusters.
+This makes it a great model for our project, since we want to pull out the most important review issues, 
+we're not interested in categorizing and exploring every small complaint topic that exists. 
+We want the big problems so restaurants can prioritize those. 
+
+Evaluating cluster quality: 
+- Silhouette score used in grid search (Silhouette score = measures how similar a data point is to its own cluster 
+compared to other clusters. A higher score indicates better-defined clusters.)
+- Visualized the clusters using a PCA 
+
+Improving model:
+- grid search hyper paramters
+    'pca__n_components': [.99, .90], #, .80, .70, .60],  # Number of components for PCA
+    'hdbscan__min_cluster_size':  [2], # [12500, 25000, 37500],  # Min cluster size for HDBSCAN --- Testing with 5%, 10% and 15% of data
+    'hdbscan__min_samples': [2, 5],  # Min samples for HDBSCAN
+    'hdbscan__metric': ['euclidean']#, 'manhattan'],  # Distance metric for HDBSCAN
+
+
+
+Bibliography: 
+
+'How To Tune HDBSCAN'
+https://towardsdatascience.com/tuning-with-hdbscan-149865ac2970
